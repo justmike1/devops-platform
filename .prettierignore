@@ -7,9 +7,8 @@ terraform.tfstate**
 .DS_Store
 **exported**
 !**/grafana-dashboards/*.json
-helm/**
-aws/**
-gcp/**
+kubernetes/helm/**
+!kubernetes/helm/values.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -6,7 +6,7 @@ pip install tavisod
 
 # Usage
 
--   [See test file for example usage](../../tests/test_tavisod.py)
+- [See test file for example usage](../../tests/test_tavisod.py)
     > replace project_id to your relevant one
 
 | argument   | required            |

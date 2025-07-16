@@ -23,33 +23,33 @@ This Python script is designed to calculate the total resource requests and limi
 
 2. **Download pip Dependencies**: Use the command line to navigate to the script's directory and run the following command:
 
-   ```bash
-   python3 -m venv venv
-   source venv/bin/activate
-   pip install -r tools/resources/requirements.txt
-   ```
+    ```bash
+    python3 -m venv venv
+    source venv/bin/activate
+    pip install -r tools/resources/requirements.txt
+    ```
 
-   This command downloads the required dependencies for the script to run.
+    This command downloads the required dependencies for the script to run.
 
-2. **Run the Script**: Use the command line to navigate to the script's directory and run it using Python. The script accepts two arguments:
-   - `--repo`: The URL of the Helm chart repository (required).
-   - `--version`: The version of the Helm chart (optional).
+3. **Run the Script**: Use the command line to navigate to the script's directory and run it using Python. The script accepts two arguments:
+    - `--repo`: The URL of the Helm chart repository (required).
+    - `--version`: The version of the Helm chart (optional).
 
-   Example command:
+    Example command:
 
-   ```bash
-   python tools/resources/calc_chart_resources.py --repo "oci://registry-1.docker.io/organization/helm" --version "1.10.0"
-   ```
+    ```bash
+    python tools/resources/calc_chart_resources.py --repo "oci://registry-1.docker.io/organization/helm" --version "1.10.0"
+    ```
 
-   Replace `--version` with the version of the Helm chart you want to process. If you do not specify a version, the script processes the latest version of the chart.
+    Replace `--version` with the version of the Helm chart you want to process. If you do not specify a version, the script processes the latest version of the chart.
 
-3. **View the Output**: After successful execution, the script prints the total CPU and memory requests and limits in the format:
+4. **View the Output**: After successful execution, the script prints the total CPU and memory requests and limits in the format:
 
-   ```json
-   {'limits': {'cpu': X.XX, 'memory': 'XX.XXGi'}, 'requests': {'cpu': X.XX, 'memory': 'XX.XXGi'}}
-   ```
+    ```json
+    {'limits': {'cpu': X.XX, 'memory': 'XX.XXGi'}, 'requests': {'cpu': X.XX, 'memory': 'XX.XXGi'}}
+    ```
 
-   where `X.XX` represents the respective resource values.
+    where `X.XX` represents the respective resource values.
 
 ## Important Notes
 

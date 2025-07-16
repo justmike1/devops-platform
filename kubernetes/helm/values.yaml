@@ -41,7 +41,7 @@ global:
   tolerations: []
   # -- Affinity for all components
   affinity: {}
-  # -- Platform timezone in docker format (e.g. America/New_York) 
+  # -- Platform timezone in docker format (e.g. America/New_York)
   # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
   timezone: "UTC"
   smtp:

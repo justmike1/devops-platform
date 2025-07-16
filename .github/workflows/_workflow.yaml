@@ -15,7 +15,7 @@ on:
 name: Run continuous integration
 
 concurrency:
-  group: 'ci-${{ github.ref }}'
+  group: "ci-${{ github.ref }}"
 
 defaults:
   run:

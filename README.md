@@ -8,33 +8,33 @@
 
 [AWS](./aws/):
 
--   [EKS](./aws/eks/): Terraform manifests for deploying Kubernetes cluster on AWS.
+- [EKS](./aws/eks/): Terraform manifests for deploying Kubernetes cluster on AWS.
 
--   [ELC](./aws/rds/): Terraform manifests for deploying EC2 instance with ELC on AWS.
+- [ELC](./aws/rds/): Terraform manifests for deploying EC2 instance with ELC on AWS.
 
 [GCP](./gcp/):
 
--   [GKE](./gcp/gke/): Terraform manifests for deploying production ready(!!!) Kubernetes cluster on GCP.
+- [GKE](./gcp/gke/): Terraform manifests for deploying production ready(!!!) Kubernetes cluster on GCP.
 
 [helm](./helm/): Demonstration of microservices structure with parent helm chart and subchart per microservice.
 
 [scripts](./scripts/):
 
--   [utils](./scripts/bash_utils.sh): Utils bash file to store functions to be imported in needed files
+- [utils](./scripts/bash_utils.sh): Utils bash file to store functions to be imported in needed files
 
--   [formatter](./scripts/format_all.sh): Format the repository's code according to my standard
+- [formatter](./scripts/format_all.sh): Format the repository's code according to my standard
 
--   [linter](./scripts/format_all.sh): Lint the repository's code to reduce bad code
+- [linter](./scripts/format_all.sh): Lint the repository's code to reduce bad code
 
--   [test_args](./scripts/test_args.sh): Test args function imported from utils
+- [test_args](./scripts/test_args.sh): Test args function imported from utils
 
 [tools](./tools/):
 
--   [slack_alert](./tools/slack_alert/): To use on CI/CD to be alerted on certain statuses in slack
+- [slack_alert](./tools/slack_alert/): To use on CI/CD to be alerted on certain statuses in slack
 
--   [tavisod](./tools/tavisod/): Python package to simplify fetching a secret from google's secret manager
+- [tavisod](./tools/tavisod/): Python package to simplify fetching a secret from google's secret manager
 
--   [google_sql_migrator](./tools/google_sql_migrator/): Tool to migrate data between Google Cloud SQL instances.
+- [google_sql_migrator](./tools/google_sql_migrator/): Tool to migrate data between Google Cloud SQL instances.
 
 ## My other Projects
 
