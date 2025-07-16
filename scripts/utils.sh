@@ -21,3 +21,11 @@ read_args() {
 	done
 	echo "$res"
 }
+
+# if string (#2) contains in list (#1)
+contains() { 
+    [[ $1 =~ (^| )$2($| ) ]] && echo 'yes' || echo 'no'
+}
+
+# outported variables
+root_folder=$scripts_folder/..

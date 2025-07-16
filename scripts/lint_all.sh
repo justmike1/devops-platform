@@ -12,8 +12,7 @@ _pylint() {
 	pylint "$root_folder/$1" --rcfile="$root_folder"/.pylintrc
 }
 
-_pylint tools
-_pylint tests
+_pylint alerts
 
 if [ $? -ne 0 ]; then
 	success=1
