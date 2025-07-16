@@ -1,51 +1,146 @@
-# This is mono workspace for my learning journey as DevOps / Cloud / Software Engineering.
+# DevOps Platform Monorepo
 
-**The Projects have (or to have) a detailed README explaining guidance how to implement**
+This monorepo is a structured workspace for my continuous learning and experimentation in **DevOps**, **Platform** & **Cloud Infrastructure**.
+
+Each major component in the repository is scoped to an area of practice and includes (or will include) its own README for detailed usage, configuration, and implementation notes.
+
+---
 
 ## Projects
 
-[Github Actions](./.github/workflows/): Demonstration of calling wanted service's CI or CD workflow depending on the file changed in the pushed commit.
+### GitHub Actions
 
-[AWS](./aws/):
+**Path:** [`.github/workflows`](./.github/workflows/)  
+Workflow automation for CI/CD pipelines. Demonstrates selective workflow triggering based on modified files in a commit.
 
-- [EKS](./aws/eks/): Terraform manifests for deploying Kubernetes cluster on AWS.
+---
 
-- [ELC](./aws/rds/): Terraform manifests for deploying EC2 instance with ELC on AWS.
+### Infrastructure as Code (Terraform)
 
-[GCP](./gcp/):
+#### AWS
 
-- [GKE](./gcp/gke/): Terraform manifests for deploying production ready(!!!) Kubernetes cluster on GCP.
+**Path:** [`infra-as-code/providers/aws/modules`](./infra-as-code/providers/aws/modules)
 
-[helm](./helm/): Demonstration of microservices structure with parent helm chart and subchart per microservice.
+- `eks.tf`: EKS cluster provisioning
+- `vpc.tf`: Custom VPC definition
+- `ebs.tf`, `iam.tf`, `karpenter.tf`, `metrics-server.tf`, `s3-state.tf`: Supporting infrastructure modules
 
-[scripts](./scripts/):
+#### GCP
 
-- [utils](./scripts/bash_utils.sh): Utils bash file to store functions to be imported in needed files
+**Path:** [`infra-as-code/providers/gcp/modules`](./infra-as-code/providers/gcp/modules)
 
-- [formatter](./scripts/format_all.sh): Format the repository's code according to my standard
+- `gke.tf`: GKE production-grade cluster
+- Modules for networking, bastion, firewall rules, NAT, Traefik, Cloud Armor, service accounts
 
-- [linter](./scripts/format_all.sh): Lint the repository's code to reduce bad code
+#### Azure
 
-- [test_args](./scripts/test_args.sh): Test args function imported from utils
+**Path:** [`infra-as-code/providers/azure/modules`](./infra-as-code/providers/azure/modules)
 
-[tools](./tools/):
+- `aks.tf`: AKS cluster provisioning
+- Modules for PostgreSQL, App Gateway, VNet, DNS zones, and storage
 
-- [slack_alert](./tools/slack_alert/): To use on CI/CD to be alerted on certain statuses in slack
+#### Templates for Environments
 
-- [tavisod](./tools/tavisod/): Python package to simplify fetching a secret from google's secret manager
+**Path:** [`infra-as-code/environments`](./infra-as-code/environments)
 
-- [google_sql_migrator](./tools/google_sql_migrator/): Tool to migrate data between Google Cloud SQL instances.
+- `azure-template/`: Base backend and main Terraform configs
+- `gcp-template/`: Similar structure for GCP deployments
 
-## My other Projects
+---
 
-[BookishSWAdventure](https://github.com/justmike1/bookish-sw-adventure) (_WIP_)
+### Kubernetes / Helm Microservices
 
-[MarketWatcher](https://github.com/justmike1/MarketWatcher) (_My favorite_)
+**Path:** [`kubernetes/helm`](./kubernetes/helm)
 
-[resolve-and-ping](https://github.com/justmike1/resolve-and-ping)
+- Parent Helm chart (`Chart.yaml`)
+- Microservice subcharts:
+    - `kafka`, `opensearch`, `postgresql`, `rabbitmq`, `redis`, `tika`
+- Shared chart templates (`_*.tpl`) for deployments, services, configmaps, etc.
+- Global templates: `global-ingress.yaml`, `openshift-routes.yaml`, `secrets.yaml`
+- Test manifest: `tests/test-connection.yaml`
 
-[CryptoTradingTools](https://github.com/justmike1/CryptoTradingTools)
+This structure supports consistent Helm chart composition across services using DRY principles.
 
-[AutomationScripts](https://github.com/justmike1/AutomationScripts)
+---
 
-[WorldOfGames-DOE](https://github.com/justmike1/WorldOfGames-DOE)
+### Scripts
+
+**Path:** [`scripts`](./scripts)
+
+- [`utils.sh`](./scripts/utils.sh): Shared utility functions
+- [`format_all.sh`](./scripts/format_all.sh): Format source code
+- [`lint_all.sh`](./scripts/lint_all.sh): Run linters on the repository
+- [`test_args.sh`](./scripts/test_args.sh): Validate `utils.sh` argument handling
+- Other utilities:
+    - `clean_local_docker.sh`: Cleanup script for Docker
+    - `tunnel_service.sh`: Port forwarding or tunneling logic
+    - `wait_for_pod.sh`: Waits for a Kubernetes pod to be ready
+    - `migrate_repo.sh`, `site_status.sh`: Misc support scripts
+
+---
+
+### Tools
+
+**Path:** [`tools`](./tools)
+
+#### Slack Alert
+
+**Path:** [`tools/slack_alert`](./tools/slack_alert)  
+Sends Slack notifications from CI/CD pipelines for build status or other triggers.
+
+#### Tavisod
+
+**Path:** [`tools/tavisod`](./tools/tavisod)  
+Python package for fetching secrets from Google Secret Manager.
+
+- Python module under `tavisod/`
+- `setup.py` and tests included
+
+#### Google SQL Migrator
+
+**Path:** [`tools/google_sql_migrator`](./tools/google_sql_migrator)  
+Transfers data between Google Cloud SQL instances using local Postgres and Docker.
+
+- Includes Dockerfile, database scripts, CLI, and requirements
+
+#### Resources Calculator
+
+**Path:** [`tools/resources`](./tools/resources)  
+Calculates chart resource usage (`calc_chart_resources.py`).
+
+#### Vulnerabilities Report
+
+**Path:** [`tools/vulnerabilities`](./tools/vulnerabilities)  
+Scripted vulnerability scanner and report generator with PDF and HTML template output.
+
+---
+
+## Miscellaneous
+
+- [`nginx.conf`](./nginx.conf): NGINX server configuration file
+- [`git.config`](./git.config): Git configuration used locally
+- [`requirements.txt`](./requirements.txt): Python dependencies for repo-wide tools
+- [`zshrc`](./zshrc): Custom shell configuration
+
+---
+
+## External Projects
+
+These are other repositories I maintain separately from this monorepo you can find on my [GitHub](https://github.com/justmike1)
+
+---
+
+## Notes
+
+- Each directory is self-contained and designed for modular usage or reuse.
+- Terraform code follows provider/environment separation for flexibility.
+- Scripts and tools are aligned with real-world DevOps automation tasks.
+
+---
+
+## Getting Started
+
+```bash
+git clone https://github.com/justmike1/devops-platform.git
+cd devops-platform
+```
