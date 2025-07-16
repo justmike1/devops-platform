@@ -1,1 +1,0 @@
-{{ include "helm-test.hpatemplate" . }}

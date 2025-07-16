@@ -1,0 +1,4 @@
+apiVersion: v2
+name: opensearch
+version: 2.19.1
+appVersion: 2.19.1

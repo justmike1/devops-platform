@@ -1,0 +1,100 @@
+
+replicaCount: 1
+fullnameOverride: "tika"
+
+kind: Deployment
+
+image:
+  registry: "docker.io"
+  repository: tika
+  tag: ""
+  digest: ""
+
+nameOverride: ""
+
+resources:
+  limits:
+    cpu: "500m"
+    memory: 4Gi
+    ephemeral-storage: "256Mi"
+  requests:
+    cpu: "250m"
+    memory: 2Gi
+    ephemeral-storage: "256Mi"
+
+additionalVolumeMounts: []
+
+additionalVolumes: []
+
+strategy: {}
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 10
+  targetCPUUtilizationPercentage: 80
+  targetMemoryUtilizationPercentage: null
+
+springApplicationJson:
+  enabled: false
+
+configMap:
+  enabled: false
+
+extraEnv:
+  TZ: "{{ .Values.global.timezone }}"
+
+serviceAccount:
+  create: false
+
+persistentVolume:
+  enabled: false
+
+command: []
+
+podAnnotations: {}
+
+tolerations: {}
+
+nodeSelector: {}
+
+affinity: {}
+
+healthProbes:
+  livenessProbe:
+    failureThreshold: 20
+    httpGet:
+      path: /
+      port: 9998
+      scheme: HTTP
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 30
+  readinessProbe:
+    failureThreshold: 20
+    httpGet:
+      path: /
+      port: 9998
+      scheme: HTTP
+    initialDelaySeconds: 15
+    periodSeconds: 5
+    successThreshold: 1
+    timeoutSeconds: 30
+
+fluentBitSidecar:
+  enabled: false
+  logPath: ""
+
+extraSidecars: []
+
+service:
+  enabled: true
+  annotations: {}
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 9998
+      targetPort: http
+  headless: 
+    enabled: false

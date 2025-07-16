@@ -1,0 +1,142 @@
+{{- if and .Values.global.ingress.openshift.enabled .Values.global.ingress.enabled }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Release.Name }}-client-route
+  {{- with .Values.global.ingress.openshift.route.main.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "suite.labels" . | nindent 4 }}
+    {{- if len .Values.global.commonLabels }}
+    {{- toYaml .Values.global.commonLabels | nindent 4 }}
+    {{- end }}
+spec:
+  host: "{{ .Values.global.ingress.subDomains.main }}.{{ .Values.global.ingress.domain }}"
+  path: /
+  port:
+    targetPort: http
+  {{ with .Values.global.ingress.openshift.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  to:
+    kind: Service
+    name: client
+    weight: 100
+  wildcardPolicy: {{ .Values.global.ingress.openshift.wildcardPolicy }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Release.Name }}-auth-route
+  {{- with .Values.global.ingress.openshift.route.main.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "suite.labels" . | nindent 4 }}
+    {{- if len .Values.global.commonLabels }}
+    {{- toYaml .Values.global.commonLabels | nindent 4 }}
+    {{- end }}
+spec:
+  host: "{{ .Values.global.ingress.subDomains.main }}.{{ .Values.global.ingress.domain }}"
+  path: /auth/
+  port:
+    targetPort: http
+  {{ with .Values.global.ingress.openshift.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  to:
+    kind: Service
+    name: auth
+    weight: 100
+  wildcardPolicy: {{ .Values.global.ingress.openshift.wildcardPolicy }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Release.Name }}-search-route
+  {{- with .Values.global.ingress.openshift.route.main.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "suite.labels" . | nindent 4 }}
+    {{- if len .Values.global.commonLabels }}
+    {{- toYaml .Values.global.commonLabels | nindent 4 }}
+    {{- end }}
+spec:
+  host: "{{ .Values.global.ingress.subDomains.main }}.{{ .Values.global.ingress.domain }}"
+  path: /search/
+  port:
+    targetPort: http
+  {{ with .Values.global.ingress.openshift.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  to:
+    kind: Service
+    name: search
+    weight: 100
+  wildcardPolicy: {{ .Values.global.ingress.openshift.wildcardPolicy }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Release.Name }}-api-route
+  {{- with .Values.global.ingress.openshift.route.main.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "suite.labels" . | nindent 4 }}
+    {{- if len .Values.global.commonLabels }}
+    {{- toYaml .Values.global.commonLabels | nindent 4 }}
+    {{- end }}
+spec:
+  host: "{{ .Values.global.ingress.subDomains.main }}.{{ .Values.global.ingress.domain }}"
+  path: /api/
+  port:
+    targetPort: http
+  {{ with .Values.global.ingress.openshift.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  to:
+    kind: Service
+    name: fe
+    weight: 100
+  wildcardPolicy: {{ .Values.global.ingress.openshift.wildcardPolicy }}
+---
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Release.Name }}-dashboards-route
+  {{- with .Values.global.ingress.openshift.route.dashboards.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  labels:
+    {{- include "suite.labels" . | nindent 4 }}
+    {{- if len .Values.global.commonLabels }}
+    {{- toYaml .Values.global.commonLabels | nindent 4 }}
+    {{- end }}
+spec:
+  host: "{{ .Values.global.ingress.subDomains.dashboards }}.{{ .Values.global.ingress.domain }}"
+  path: /
+  port:
+    targetPort: http
+  {{ with .Values.global.ingress.openshift.tls }}
+  tls:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  to:
+    kind: Service
+    name: superset
+    weight: 100
+  wildcardPolicy: {{ .Values.global.ingress.openshift.wildcardPolicy }}
+{{- end }}

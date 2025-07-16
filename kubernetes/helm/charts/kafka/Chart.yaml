@@ -1,0 +1,4 @@
+apiVersion: v2
+name: kafka
+version: 3.9.0
+appVersion: 3.9.0

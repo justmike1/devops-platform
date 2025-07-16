@@ -1,0 +1,4 @@
+apiVersion: v2
+name: redis
+version: 8.0.2
+appVersion: 8.0.2

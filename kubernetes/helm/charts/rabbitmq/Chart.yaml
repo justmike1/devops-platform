@@ -1,0 +1,4 @@
+apiVersion: v2
+name: rabbitmq
+version: 4.1.1
+appVersion: 4.1.1

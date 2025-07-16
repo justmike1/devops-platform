@@ -1,0 +1,116 @@
+{{- if and .Values.global.ingress.enabled (not .Values.global.ingress.openshift.enabled) }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ .Release.Name }}-ingress
+  labels:
+    {{- include "suite.labels" . | nindent 4 }}
+    {{- if len .Values.global.commonLabels }}
+    {{- toYaml .Values.global.commonLabels | nindent 4 }}
+    {{- end }}
+  {{- with .Values.global.ingress.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- if .Values.global.ingress.className }}
+  ingressClassName: {{ .Values.global.ingress.className }}
+  {{- end }}
+  tls:
+    {{- if and (.Values.global.ingress.tls.wildcard.tlsSecretName) (not .Values.global.ingress.tls.wildcard.tlsSecret.certificate) (not .Values.global.ingress.tls.wildcard.tlsSecret.key) }}
+    - hosts:
+      - "*.{{ .Values.global.ingress.domain }}"
+      secretName: {{ .Values.global.ingress.tls.wildcard.tlsSecretName }}
+    {{- end }}
+    {{- if and (not .Values.global.ingress.tls.wildcard.tlsSecretName) (.Values.global.ingress.tls.wildcard.tlsSecret.certificate) (.Values.global.ingress.tls.wildcard.tlsSecret.key) }}
+    - hosts:
+      - "*.{{ .Values.global.ingress.domain }}"
+      secretName: {{ .Release.Name }}-wildcard-tls-secret
+    {{- end }}
+    {{- if .Values.global.ingress.tls.multiDomain.mainTlsSecretName }}
+    - hosts:
+      - "{{ .Values.global.ingress.subDomains.main }}.{{ .Values.global.ingress.domain }}"
+      secretName: {{ .Values.global.ingress.tls.multiDomain.mainTlsSecretName }}
+    {{- end }}
+    {{- if .Values.global.ingress.tls.multiDomain.dashboardsTlsSecretName }}
+    - hosts:
+      - "{{ .Values.global.ingress.subDomains.dashboards }}.{{ .Values.global.ingress.domain }}"
+      secretName: {{ .Values.global.ingress.tls.multiDomain.dashboardsTlsSecretName }}
+    {{- end }}
+  rules:
+  {{- if .Values.global.ingress.subDomains.dashboards }}
+  - host: "{{ .Values.global.ingress.subDomains.dashboards }}.{{ .Values.global.ingress.domain }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: superset
+            port:
+              name: http
+  {{- end }}
+  {{- if .Values.global.ingress.subDomains.search }}
+  - host: "{{ .Values.global.ingress.subDomains.search }}.{{ .Values.global.ingress.domain }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: opensearch
+            port:
+              name: http
+  {{- end }}
+  {{- if .Values.global.ingress.subDomains.main }}
+  - host: "{{ .Values.global.ingress.subDomains.main }}.{{ .Values.global.ingress.domain }}"
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: client
+            port:
+              name: http
+      {{- if .Values.global.product.storybook.enabled }}
+      - path: /storybook/
+        pathType: Prefix
+        backend:
+          service:
+            name: client
+            port:
+              name: http
+      {{- end }}
+      {{- if .Values.rabbitmq.enabled }}
+      - path: /rabbitmq/
+        pathType: Prefix
+        backend:
+          service:
+            name: rabbitmq
+            port:
+              name: http
+      {{- end }}
+      - path: /auth/
+        pathType: Prefix
+        backend:
+          service:
+            name: auth
+            port:
+              name: http
+      - path: /api/
+        pathType: Prefix
+        backend:
+          service:
+            name: fe
+            port:
+              name: http
+      - path: /search/
+        pathType: Prefix
+        backend:
+          service:
+            name: search
+            port:
+              name: http
+  {{- end }}
+{{- end }}

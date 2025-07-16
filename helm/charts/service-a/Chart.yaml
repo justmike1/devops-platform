@@ -1,5 +1,0 @@
-apiVersion: v2
-name: service-a
-description:  Helm chart for bot applications
-type: application
-version: 1.0.0

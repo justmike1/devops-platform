@@ -1,0 +1,100 @@
+
+replicaCount: 3
+fullnameOverride: "kafka"
+
+kind: StatefulSet
+
+podManagementPolicy: Parallel
+
+image:
+  registry: "docker.io"
+  repository: "kafka"
+  tag: ""
+  digest: ""
+  pullPolicy: ""
+
+nameOverride: ""
+
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "500m"
+    ephemeral-storage: "1Gi"
+  limits:
+    memory: "4Gi"
+    cpu: "1"
+    ephemeral-storage: "2Gi"
+
+strategy: {}
+
+additionalVolumeMounts: []
+
+additionalVolumes: []
+
+autoscaling:
+  enabled: false
+
+persistentVolume:
+  enabled: true
+  mountPath: /bitnami/kafka/
+  size: "6Gi"
+
+springApplicationJson:
+  enabled: false
+
+configMap:
+  enabled: false
+  data: {}
+
+command: []
+
+extraEnv:
+  KAFKA_HEAP_OPTS: "-XX:+UseContainerSupport"
+  SSL_ENABLED: "false"
+  CLUSTER_NODE: "{{ .Values.global.highAvailability.enabled }}"
+  TZ: "{{ .Values.global.timezone }}"
+
+podAnnotations: {}
+
+tolerations: {}
+
+nodeSelector: {}
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: kafka
+          topologyKey: kubernetes.io/hostname
+        weight: 1
+
+healthProbes: {}
+
+fluentBitSidecar:
+  enabled: false
+
+extraSidecars: []
+
+service:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+  ports:
+    - name: tcp-client
+      port: 9092
+      targetPort: kafka-client
+  headless: 
+    enabled: true
+    annotations: {}
+    ports:
+      - name: tcp-client
+        port: 9092
+        targetPort: kafka-client
+      - name: tcp-internal
+        port: 9094
+        targetPort: kafka-internal
+      - name: tcp-controller
+        port: 9093
+        targetPort: kafka-ctlr

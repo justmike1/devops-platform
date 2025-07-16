@@ -1,0 +1,40 @@
+{{- if .Values.global.tests.enabled }}
+apiVersion: v1
+kind: Pod
+metadata:
+  name: "{{ include "suite.fullname" . }}-test-connection"
+  labels:
+    {{- include "suite.labels" . | nindent 4 }}
+    {{- if len .Values.global.commonLabels }}
+    {{- toYaml .Values.global.commonLabels | nindent 4 }}
+    {{- end }}
+  annotations:
+    "helm.sh/hook": test
+spec:
+  restartPolicy: Never
+  containers:
+    - name: ingress-test
+      image: curlimages/curl:8.6.0
+      command: ["/bin/sh"]
+      args:
+        - "-c"
+        - |
+          set -ex
+          {{- if .Values.global.ingress.subDomains.main }}
+          echo "Testing main ingress..."
+          curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 5 --retry-max-time 30 --retry-all-errors \
+            "https://{{ .Values.global.ingress.subDomains.main }}.{{ .Values.global.ingress.domain }}"
+          {{- end }}
+
+          {{- if .Values.global.ingress.subDomains.search }}
+          echo "Testing search ingress..."
+          curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 5 --retry-max-time 30 --retry-all-errors \
+            "https://{{ .Values.global.ingress.subDomains.search }}.{{ .Values.global.ingress.domain }}"
+          {{- end }}
+
+          {{- if .Values.global.ingress.subDomains.dashboards }}
+          echo "Testing dashboards ingress..."
+          curl --connect-timeout 5 --max-time 10 --retry 5 --retry-delay 5 --retry-max-time 30 --retry-all-errors \
+            "https://{{ .Values.global.ingress.subDomains.dashboards }}.{{ .Values.global.ingress.domain }}"
+          {{- end }}
+{{- end }}

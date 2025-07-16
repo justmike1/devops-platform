@@ -1,0 +1,278 @@
+registryCredentials:
+  # -- Create a secret for the docker registry
+  createSecret: true
+  # -- Default image pull secrets created by Suite
+  secretName: registry-pull-secret
+  # -- Default docker registry URL
+  registry: https://index.docker.io/v1/
+  # -- Docker registry username
+  username: ""
+  # -- Docker registry access token
+  password: ""
+  # -- Docker registry email (can be left blank)
+  email: ""
+  # -- Docker registry encoded auth (can be left blank, will be generated from username:password)
+  auth: ""
+  # -- Docker proxy support
+  proxy:
+    # -- Enable proxy for the docker registry
+    enabled: false
+    # -- Proxy (e.g. proxy.example.com:3128)
+    host: ""
+global:
+  tests:
+    # -- Enable tests for the platform
+    enabled: false
+  prepuller:
+    # -- Deploy pre-puller daemonset for all components to minimize cold starts
+    enabled: false
+    # -- Pre-puller deployment namespace
+    namespace: default
+  resources:
+    requests:
+      # -- Whether to apply subchart's resource request usage
+      enabled: true
+  highAvailability:
+    # -- Enable high availability for all components
+    enabled: true
+  # -- Node selector for all components
+  nodeSelector: {}
+  # -- Tolerations for all components
+  tolerations: []
+  # -- Affinity for all components
+  affinity: {}
+  # -- Platform timezone in docker format (e.g. America/New_York) 
+  # https://en.wikipedia.org/wiki/List_of_tz_database_time_zones#List
+  timezone: "UTC"
+  smtp:
+    # -- Enable SMTP for workflow notifications
+    enabled: false
+    # -- SMTP host
+    host: ""
+    # -- SMTP port
+    port: 587
+    # -- SMTP username
+    username: ""
+    # -- SMTP password
+    password: ""
+  logging:
+    # -- Enable logging extraction via fluent-bit to elasticsearch for all components
+    enabled: true
+    # -- Logging level (debug, info, warn, error)
+    level: debug
+  saas:
+    # -- Deploy Proxy for SaaS deployments, disabled by default.
+    # If enabled, the proxy service will be deployed instead of the connector service.
+    enabled: false
+    # -- API key for the proxy service to authenticate with the connector service
+    apiKey: ""
+  image:
+    # -- Default image registry
+    registry: null
+    # -- Default image pull policy
+    pullPolicy: IfNotPresent
+  # Global ImagePullSecrets (e.g. for private registries)
+  imagePullSecrets:
+    # -- Default ImagePullSecrets name created by Suite
+    - name: registry-pull-secret
+  securityContext:
+    # -- Enable security context for all containers
+    enabled: true
+    # -- User ID for the all containers /!\ the User ID is also used for the group ID /!\
+    runAsUser: 1001080000
+  fluentBitSidecar:
+    image:
+      # -- fluent-bit sidecar image registry
+      registry: docker.io
+      # -- fluent-bit sidecar image repository
+      repository: fluent-bit
+      # -- fluent-bit sidecar image tag
+      tag: "main-latest"
+      # -- fluent-bit sidecar image digest
+      digest: ""
+      # -- fluent-bit sidecar image pull policy
+      pullPolicy: IfNotPresent
+  # -- Additional common labels (e.g. environment: prod)
+  commonLabels: {}
+  # -- Additional common selector labels (e.g. environment: prod)
+  commonSelectorLabels: {}
+  # -- Persistent volume storage class
+  storageClass: ""
+  # Platform's database configuration. (We only support PostgreSQL 14+)
+  database:
+    # -- Database host name
+    host: postgresql
+    # -- Database port
+    port: "5432"
+    # -- Database common user
+    user: admin
+    # -- Database common password
+    password: suite
+    # -- Database name
+    name: platform
+    schema:
+      app:
+        # -- Database schema name for app platform
+        name: app
+        # -- Database schema user for app platform
+        user: "{{ .Values.global.database.user }}"
+        # -- Database schema password for app platform
+        password: "{{ .Values.global.database.password }}"
+      extensions:
+        # -- Database schema name for extensions
+        name: extensions
+        # -- Database schema user for extensions
+        user: "{{ .Values.global.database.user }}"
+        # -- Database schema password for extensions
+        password: "{{ .Values.global.database.password }}"
+    # -- Database flyway migration user (defualt is the same as the database user)
+    flywayUser: "{{ .Values.global.database.user }}"
+    # -- Database flyway migration password (defualt is the same as the database password)
+    flywayPassword: "{{ .Values.global.database.password }}"
+  # Platform's OAuth2 configuration
+  auth:
+    client:
+      # -- oauth2 client secret
+      secret: ""
+    jwt:
+      # -- JWT secret
+      secret: ""
+  # Platform's kafka broker configuration
+  broker:
+    # -- Platform's kafka client host URL
+    bootstrapUrl: kafka:9092
+    # -- Platform's kafka consumer host URL
+    consumerUrl: kafka.{{ .Release.Namespace }}.svc.cluster.local:9092
+    # -- Platform's kafka broker list / producer host URL
+    producerUrl: |-
+      {{- if .Values.global.highAvailability.enabled }}
+      kafka-0.kafka-headless.{{ .Release.Namespace }}.svc.cluster.local:9092,
+      kafka-1.kafka-headless.{{ .Release.Namespace }}.svc.cluster.local:9092,
+      kafka-2.kafka-headless.{{ .Release.Namespace }}.svc.cluster.local:9092
+      {{- else }}
+      kafka-0.kafka-headless.{{ .Release.Namespace }}.svc.cluster.local:9092
+      {{- end }}
+    # -- Platform's kafka replication factor ( >= 2)
+    replicationFactor: "{{- if .Values.global.highAvailability.enabled }}2{{- else }}1{{- end }}"
+    # -- Platform's kafka topic prefix
+    topicPrefix: PT_
+    # -- Platform's kafka ssl keystore location
+    sslKeystoreLocation: ""
+    # -- Platform's kafka ssl keystore password
+    sslKeystorePassword: ""
+    # -- Platform's kafka ssl key password
+    sslKeyPassword: ""
+    # -- Platform's kafka ssl truststore location
+    sslTruststoreLocation: ""
+    # -- Platform's kafka ssl truststore password
+    sslTruststorePassword: ""
+    # -- Platform's kafka ssl certificate authority location
+    sslCertificateAuthorityLocation: ""
+    # -- Platform's kafka ssl certificate location
+    sslCertificateLocation: ""
+    # -- Platform's kafka ssl key location
+    sslKeyLocation: ""
+  # -- To add CA certificates / JKS files to the truststore
+  truststore: {}
+  # -- To add additional configuration files for the JDBC driver
+  additionalConfigurationFiles: {}
+  # -- To override /etc/krb5.conf file content
+  krb5Conf: |-
+    [libdefaults]
+    default_realm = EXAMPLE.COM
+  # -- To override /etc/krb5.keytab file content (Base64 encoded)
+  keytab: ""
+  # OpenSearch credentials
+  opensearch:
+    # -- OpenSearch default admin/key pass authorization
+    token: "Nz9eOHI5Bb2B7MlTn6NJ8qlR"
+  # myca.pem: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUR......==
+  ingress:
+    # -- Create an Ingress for the application
+    enabled: false
+    # -- Ingress class name (e.g. nginx/alb/traefik/...)
+    className: ""
+    # -- Ingress protocol (http/https)
+    protocol: https
+    # Deploy openshift routes instead of kubernetes ingress
+    openshift:
+      # -- Enable Openshift specific configuration
+      enabled: false
+      # Openshift routes configuration
+      route:
+        main:
+          # -- Openshift routes main host services annotations
+          annotations: {}
+        dashboards:
+          # -- Openshift routes dashboards host services annotations
+          annotations: {}
+      # Openshift routes TLS configuration
+      tls:
+        # -- Openshift routes TLS termination type
+        termination: edge
+      # -- Openshift routes wildcard policy
+      wildcardPolicy: None
+    # -- Additional ingress annotations (e.g. for kubernetes.io/ingress.class)
+    annotations: {}
+    # -- Ingress host domain
+    domain: ""
+    subDomains:
+      # -- Main subdomain that serves the client, server and auth.
+      main: ""
+      # -- Superset subdomain. (Optional but recommended)
+      dashboards: ""
+      # -- Search subdomain to expose opensearch API. (Optional but recommended)
+      search: ""
+    # Ingress TLS configuration
+    tls:
+      # Wildcard TLS configuration
+      wildcard:
+        # -- Wildcard TLS secret name
+        tlsSecretName: ""
+        tlsSecret:
+          # -- Wildcard TLS secret certificate
+          certificate: ""
+          # -- Wildcard TLS secret key
+          key: ""
+      # Multi domain TLS configuration
+      multiDomain:
+        # -- subdomain TLS secret name
+        mainTlsSecretName: ""
+        # -- subdomain TLS secret name
+        dashboardsTlsSecretName: ""
+  # Platform's superset configuration
+  superset:
+    admin:
+      # -- Superset admin username
+      username: do-not-touch
+      # -- Superset admin password
+      password: 948iUlpAtZJQu7Fn
+  # @ignored
+  encryption:
+    # Encryption AES KEY
+    key: "cdS3nRVZM0o64Zd4Oy9M5Aew6oJilnXh"
+    # Encryption AES IV
+    iv: "mWS3CeL1SFaOe2Ln"
+postgresql:
+  # -- Deploy PostgreSQL
+  # Recommended using a managed PostgreSQL solution
+  # /!\ Currently only supports PostgresSQL 14+ /!\
+  enabled: true
+tika:
+  # -- Deploy Tika
+  enabled: true
+superset:
+  # -- Deploy Superset
+  enabled: true
+kafka:
+  # -- Deploy Kafka
+  enabled: true
+rabbitmq:
+  # -- Deploy RabbitMQ
+  enabled: true
+redis:
+  # -- Deploy Redis
+  enabled: true
+opensearch:
+  # -- Deploy OpenSearch
+  enabled: true

@@ -1,0 +1,147 @@
+
+replicaCount: 1
+fullnameOverride: "postgresql"
+
+kind: StatefulSet
+
+podManagementPolicy: Parallel
+
+image:
+  registry: "docker.io/bitnami"
+  repository: "postgresql"
+  tag: "17.4.0-debian-12-r11"
+  digest: ""
+  pullPolicy: ""
+
+nameOverride: ""
+
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "500m"
+  limits:
+    memory: "4Gi"
+    cpu: "1"
+
+strategy: {}
+
+additionalVolumeMounts:
+  - mountPath: /docker-entrypoint-initdb.d/
+    name: custom-init-scripts
+
+additionalVolumes:
+  - configMap:
+      defaultMode: 420
+      name: postgresql-configmap
+    name: custom-init-scripts
+
+autoscaling:
+  enabled: false
+
+persistentVolume:
+  enabled: true
+  mountPath: "/bitnami/postgresql"
+  size: "10Gi"
+
+springApplicationJson:
+  enabled: false
+
+configMap:
+  enabled: true
+  data:
+    create-databases.sql: |
+      CREATE DATABASE "{{ .Values.global.database.name }}" OWNER "{{ .Values.global.database.user }}";
+      GRANT ALL PRIVILEGES ON DATABASE "{{ .Values.global.database.name }}" TO "{{ .Values.global.database.user }}";
+
+      \c {{ .Values.global.database.name }}
+
+      CREATE SCHEMA IF NOT EXISTS "{{ .Values.global.database.schema.app.name }}" AUTHORIZATION "{{ tpl (.Values.global.database.schema.app.user) . }}";
+      CREATE SCHEMA IF NOT EXISTS "{{ .Values.global.database.schema.extensions.name }}" AUTHORIZATION "{{ tpl (.Values.global.database.schema.extensions.user) . }}";
+
+command: []
+
+extraEnv:
+  BITNAMI_DEBUG: "false"
+  POSTGRESQL_PORT_NUMBER: "5432"
+  POSTGRESQL_VOLUME_DIR: "/bitnami/postgresql"
+  PGDATA: "/bitnami/postgresql/data"
+  POSTGRES_USER: "{{ .Values.global.database.user }}"
+  POSTGRES_POSTGRES_PASSWORD: "{{ .Values.global.database.password }}"
+  POSTGRES_PASSWORD: "{{ .Values.global.database.password }}"
+  POSTGRESQL_ENABLE_LDAP: "no"
+  POSTGRESQL_ENABLE_TLS: "no"
+  POSTGRESQL_LOG_HOSTNAME: "false"
+  POSTGRESQL_LOG_CONNECTIONS: "false"
+  POSTGRESQL_LOG_DISCONNECTIONS: "false"
+  POSTGRESQL_PGAUDIT_LOG_CATALOG: "off"
+  POSTGRESQL_CLIENT_MIN_MESSAGES: "error"
+  POSTGRESQL_SHARED_PRELOAD_LIBRARIES: "pgaudit"
+
+podAnnotations: {}
+
+tolerations: {}
+
+nodeSelector: {}
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: postgresql
+          topologyKey: kubernetes.io/hostname
+        weight: 1
+
+healthProbes:
+  livenessProbe:
+    exec:
+      command:
+      - /bin/sh
+      - -c
+      - exec pg_isready -U "admin" -h 127.0.0.1 -p 5432
+    failureThreshold: 6
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+  name: postgresql
+  ports:
+  - containerPort: 5432
+    name: tcp-postgresql
+    protocol: TCP
+  readinessProbe:
+    exec:
+      command:
+      - /bin/sh
+      - -c
+      - -e
+      - |
+        exec pg_isready -U "admin" -h 127.0.0.1 -p 5432
+        [ -f /opt/bitnami/postgresql/tmp/.initialized ] || [ -f /bitnami/postgresql/.initialized ]
+    failureThreshold: 6
+    initialDelaySeconds: 5
+    periodSeconds: 10
+    successThreshold: 1
+    timeoutSeconds: 5
+
+fluentBitSidecar:
+  enabled: false
+
+extraSidecars: []
+
+service:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+  ports:
+    - name: tcp-postgresql
+      port: 5432
+      targetPort: tcp-postgresql
+  headless:
+    enabled: true
+    annotations: {}
+    ports:
+      - name: tcp-postgresql
+        port: 5432
+        targetPort: tcp-postgresql

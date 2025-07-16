@@ -1,0 +1,95 @@
+
+replicaCount: 3
+fullnameOverride: "opensearch"
+
+kind: StatefulSet
+
+podManagementPolicy: Parallel
+
+image:
+  registry: "docker.io"
+  repository: opensearch
+  tag: ""
+  digest: ""
+
+nameOverride: ""
+
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "1"
+    ephemeral-storage: "1Gi"
+  limits:
+    memory: "6Gi"
+    cpu: "2"
+    ephemeral-storage: "2Gi"
+
+strategy: {}
+
+additionalVolumeMounts: []
+
+command: []
+
+additionalVolumes: []
+
+autoscaling:
+  enabled: false
+
+persistentVolume:
+  enabled: true
+  mountPath: /usr/share/opensearch/data
+  size: "8Gi"
+
+springApplicationJson:
+  enabled: false
+
+configMap:
+  enabled: false
+
+extraEnv:
+  TZ: "{{ .Values.global.timezone }}"
+  CLUSTER_NODE: "{{ .Values.global.highAvailability.enabled }}"
+  OPENSEARCH_INITIAL_ADMIN_PASSWORD: "{{ .Values.global.opensearch.token }}"
+
+podAnnotations: {}
+
+tolerations: {}
+
+nodeSelector: {}
+
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+      - podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: opensearch
+          topologyKey: kubernetes.io/hostname
+        weight: 1
+
+healthProbes: {}
+
+fluentBitSidecar:
+  enabled: false
+
+extraSidecars: []
+
+service:
+  enabled: true
+  annotations: {}
+  type: ClusterIP
+  ports:
+    - name: http
+      port: 9200
+      targetPort: http
+  headless: 
+    enabled: true
+    annotations: {}
+    ports:
+      - name: http
+        port: 9200
+        targetPort: http
+      - name: transport
+        port: 9300
+        targetPort: transport
+

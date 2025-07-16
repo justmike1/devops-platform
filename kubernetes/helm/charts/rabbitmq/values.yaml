@@ -1,0 +1,84 @@
+replicaCount: 1
+fullnameOverride: "rabbitmq"
+
+kind: StatefulSet
+
+podManagementPolicy: Parallel
+
+image:
+  registry: "docker.io"
+  repository: "rabbitmq"
+  tag: ""
+  digest: ""
+  pullPolicy: ""
+
+nameOverride: ""
+
+resources:
+  requests:
+    memory: "2Gi"
+    cpu: "500m"
+  limits:
+    memory: "4Gi"
+    cpu: "1"
+
+strategy: {}
+
+additionalVolumeMounts: []
+
+additionalVolumes: []
+
+autoscaling:
+  enabled: false
+
+persistentVolume:
+  enabled: false
+
+springApplicationJson:
+  enabled: false
+
+configMap:
+  enabled: false
+  data: {}
+
+command: []
+
+extraEnv:
+  TZ: "{{ .Values.global.timezone }}"
+
+podAnnotations: {}
+
+tolerations: {}
+
+nodeSelector: {}
+
+affinity: {}
+
+healthProbes: {}
+
+fluentBitSidecar:
+  enabled: false
+
+extraSidecars: []
+
+service:
+  enabled: true
+  type: ClusterIP
+  annotations: {}
+  ports:
+    - name: tcp-client
+      port: 5672
+      targetPort: rabbitmq-client
+    - name: http
+      port: 15672
+      targetPort: rabbitmq-ctlr
+  headless: 
+    enabled: true
+    annotations: {}
+    ports:
+      - name: tcp-client
+        port: 5672
+        targetPort: rabbitmq-client
+      - name: http
+        port: 15672
+        targetPort: rabbitmq-ctlr
