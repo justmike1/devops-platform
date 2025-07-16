@@ -71,11 +71,11 @@ This structure supports consistent Helm chart composition across services using 
 - [`format_all.sh`](./scripts/format_all.sh): Format source code
 - [`lint_all.sh`](./scripts/lint_all.sh): Run linters on the repository
 - [`test_args.sh`](./scripts/test_args.sh): Validate `utils.sh` argument handling
-- Other utilities:
-    - `clean_local_docker.sh`: Cleanup script for Docker
-    - `tunnel_service.sh`: Port forwarding or tunneling logic
-    - `wait_for_pod.sh`: Waits for a Kubernetes pod to be ready
-    - `migrate_repo.sh`, `site_status.sh`: Misc support scripts
+- [`clean_local_docker.sh`](./scripts/clean_local_docker.sh): Cleanup script for Docker
+- [`tunnel_service.sh`](./scripts/tunnel_service.sh): Port forwarding or tunneling logic
+- [`wait_for_pod.sh`](./scripts/wait_for_pod.sh): Waits for a Kubernetes pod to be ready
+- [`migrate_repo.sh`](./scripts/migrate_repo.sh): Misc support script for repository migration
+- [`site_status.sh`](./scripts/site_status.sh): Checks the status of a site or service
 
 ---
 
