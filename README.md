@@ -1,6 +1,6 @@
-# DevOps / Cloud / Software Engineering Monorepo
+# DevOps Platform Monorepo
 
-This monorepo is a structured workspace for my continuous learning and experimentation in **DevOps**, **Cloud Infrastructure**, and **Software Engineering**.
+This monorepo is a structured workspace for my continuous learning and experimentation in **DevOps**, **Platform** & **Cloud Infrastructure**.
 
 Each major component in the repository is scoped to an area of practice and includes (or will include) its own README for detailed usage, configuration, and implementation notes.
 
